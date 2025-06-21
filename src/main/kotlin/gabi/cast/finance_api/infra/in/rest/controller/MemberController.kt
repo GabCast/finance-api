@@ -1,36 +1,35 @@
 package gabi.cast.finance_api.infra.`in`.rest.controller
 
-import gabi.cast.finance_api.infra.out.rest.AccountDTO
-import gabi.cast.finance_api.infra.out.rest.toDTO
-import gabi.cast.finance_api.domain.`in`.AccountService
-import gabi.cast.finance_api.domain.`in`.entity.account.Account
+import gabi.cast.finance_api.domain.`in`.MemberService
+import gabi.cast.finance_api.domain.`in`.entity.Member
 import gabi.cast.finance_api.domain.shared.ActionResult
-import gabi.cast.finance_api.infra.`in`.rest.model.AccountDomain
+import gabi.cast.finance_api.infra.`in`.rest.model.MemberDomain
 import gabi.cast.finance_api.infra.`in`.rest.resource.BaseResponseBody
 import gabi.cast.finance_api.infra.`in`.rest.resource.ErrorResponse
+import gabi.cast.finance_api.infra.out.rest.MemberDTO
+import gabi.cast.finance_api.infra.out.rest.toDTO
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.bind.annotation.RequestBody
-import io.swagger.v3.oas.annotations.parameters.RequestBody as SwaggerRequestBody
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import io.swagger.v3.oas.annotations.parameters.RequestBody as SwaggerRequestBody
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
-import java.util.UUID
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/account")
-class AccountController (private val accountsService: AccountService) {
+@RequestMapping("/member")
+class MemberController(private val memberService: MemberService) {
 
-    @Operation(summary = "accounts section")
+    @Operation(summary = "member section")
     @GetMapping()
-    fun accounts(@RequestParam(required = true) memberId: UUID) : ResponseEntity<*> {
+    fun member(@RequestParam(required = true) reference: String) : ResponseEntity<*> {
         return when (val actionResult =
-            accountsService.findByMemberId(memberId)) {
+            memberService.findByReference(reference)) {
             is ActionResult.Error -> {
                 val errorResponse =
                     ErrorResponse.from(
@@ -39,25 +38,25 @@ class AccountController (private val accountsService: AccountService) {
                 ResponseEntity.status(errorResponse.httpStatusCode).body(errorResponse)
             }
 
-            is ActionResult.Success -> BaseResponseBody.from<List<Account>, List<AccountDTO>>(actionResult)
-            { accounts -> accounts?.map { it.toDTO() } }.asEntity(successHttpStatus = HttpStatus.OK)
+            is ActionResult.Success -> BaseResponseBody.from<Member, MemberDTO>(actionResult)
+            { it?.toDTO() }.asEntity(successHttpStatus = HttpStatus.OK)
         }
     }
 
     @Operation(
-        summary = "Create a new account",
-        description = "Creates a new account with the specified data.",
+        summary = "Create a new member",
+        description = "Creates a new member with the specified data.",
         requestBody = SwaggerRequestBody(
-            description = "Account to be created",
+            description = "Member to be created",
             required = true,
-            content = [Content(schema = Schema(implementation = AccountDomain::class))]
+            content = [Content(schema = Schema(implementation = MemberDomain::class))]
         )
     )
     @PostMapping()
-    fun createAccount(@RequestBody(required = true) account: AccountDomain) : ResponseEntity<*> {
+    fun createMember(@RequestBody(required = true) member: MemberDomain) : ResponseEntity<*> {
 
         return when (val actionResult =
-            accountsService.save(account)) {
+            memberService.save(member)) {
             is ActionResult.Error -> {
                 val errorResponse =
                     ErrorResponse.from(
@@ -66,7 +65,7 @@ class AccountController (private val accountsService: AccountService) {
                 ResponseEntity.status(errorResponse.httpStatusCode).body(errorResponse)
             }
 
-            is ActionResult.Success -> BaseResponseBody.from<Account, AccountDTO>(actionResult)
+            is ActionResult.Success -> BaseResponseBody.from<Member, MemberDTO>(actionResult)
             { it?.toDTO() }.asEntity(successHttpStatus = HttpStatus.CREATED)
         }
     }

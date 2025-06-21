@@ -17,11 +17,12 @@ sealed class ErrorResponse(
 ) : Serializable {
     companion object {
         fun from(errorResult: ErrorResult): ErrorResponse {
-            var errorResponse = when (errorResult) {
+            val errorResponse = when (errorResult) {
                 ErrorResult.ConnectionTimeoutError -> ConnectionTimeoutError
                 ErrorResult.InternalServerError -> InternalServerError
                 ErrorResult.NotFound -> NotFoundError
                 ErrorResult.MemberNotFound -> MemberNotFoundError
+                ErrorResult.AccountsNotFound -> AccountsNotFoundError
             }
             errorResponse.traceId = UUID.randomUUID().toString()
             return errorResponse
@@ -48,6 +49,13 @@ sealed class ErrorResponse(
         errorCode = "MEMBER NOT FOUND",
         title = "No member found with the id.",
         message = "No member found with the id."
+    )
+
+    data object AccountsNotFoundError : ErrorResponse(
+        HttpStatus.NOT_FOUND,
+        errorCode = "ACCOUNTS NOT FOUND",
+        title = "No accounts found for this member.",
+        message = "No accounts found for this member."
     )
 
     data class BadRequestError(

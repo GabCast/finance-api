@@ -3,7 +3,6 @@ package gabi.cast.finance_api.domain.`in`.usecase.account
 import gabi.cast.finance_api.domain.`in`.AccountService
 import gabi.cast.finance_api.domain.`in`.entity.account.Account
 import gabi.cast.finance_api.domain.shared.ActionResult
-import gabi.cast.finance_api.domain.shared.Currency
 import gabi.cast.finance_api.domain.shared.ErrorResult
 import gabi.cast.finance_api.infra.`in`.rest.model.AccountDomain
 import gabi.cast.finance_api.infra.out.repository.AccountAdapter
@@ -17,8 +16,12 @@ class AccountServiceImpl(
     private val memberAdapter: MemberAdapter
 ) : AccountService {
 
-    override fun findAll(): List<Account?> {
-        return accountAdapter.findAll()
+    override fun findByMemberId(id: UUID): ActionResult {
+        val accounts = accountAdapter.findByMemberId(id)
+        return when {
+            accounts.isEmpty() -> ActionResult.Error(ErrorResult.AccountsNotFound)
+            else -> ActionResult.Success(accounts)
+        }
     }
 
     override fun save(account: AccountDomain): ActionResult {
