@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import io.swagger.v3.oas.annotations.parameters.RequestBody as SwaggerRequestBody
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.PathVariable
 import java.util.UUID
 
 @RestController
@@ -27,8 +27,8 @@ import java.util.UUID
 class AccountController (private val accountsService: AccountService) {
 
     @Operation(summary = "accounts section")
-    @GetMapping()
-    fun accounts(@RequestParam(required = true) memberId: UUID) : ResponseEntity<*> {
+    @GetMapping("/member/{memberId}")
+    fun accounts(@PathVariable(required = true) memberId: UUID) : ResponseEntity<*> {
         return when (val actionResult =
             accountsService.findByMemberId(memberId)) {
             is ActionResult.Error -> {
