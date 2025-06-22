@@ -7,5 +7,6 @@ import java.util.UUID
 interface AccountService {
 
     fun findByMemberId(id: UUID) : ActionResult
+    fun findById(id: UUID) : ActionResult
     fun save(account: AccountDomain) : ActionResult
 }

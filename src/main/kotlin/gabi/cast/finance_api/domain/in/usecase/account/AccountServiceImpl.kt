@@ -24,6 +24,14 @@ class AccountServiceImpl(
         }
     }
 
+    override fun findById(id: UUID): ActionResult {
+        accountAdapter.findById(id).let { account ->
+            account.orElse(null)?.let {
+                return ActionResult.Error(ErrorResult.AccountNotFound)
+            }.run { return ActionResult.Success(account) }
+        }
+    }
+
     override fun save(account: AccountDomain): ActionResult {
 
         // retrieve the member or throw error

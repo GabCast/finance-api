@@ -4,6 +4,7 @@ sealed class ErrorResult {
     data object InternalServerError : ErrorResult()
     data object MemberNotFound : ErrorResult()
     data object AccountsNotFound : ErrorResult()
+    data object AccountNotFound : ErrorResult()
     data object ConnectionTimeoutError : ErrorResult()
     data object NotFound : ErrorResult()
     data object ActivitiesForMemberNotFound : ErrorResult()

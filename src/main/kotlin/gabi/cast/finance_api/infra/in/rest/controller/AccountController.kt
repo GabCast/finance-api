@@ -26,6 +26,24 @@ import java.util.UUID
 @RequestMapping("/account")
 class AccountController (private val accountsService: AccountService) {
 
+    @Operation(summary = "account by Id")
+    @GetMapping("/{accountId}")
+    fun account(@PathVariable(required = true) accountId: UUID) : ResponseEntity<*> {
+        return when (val actionResult =
+            accountsService.findById(accountId)) {
+            is ActionResult.Error -> {
+                val errorResponse =
+                    ErrorResponse.from(
+                        actionResult.error
+                    )
+                ResponseEntity.status(errorResponse.httpStatusCode).body(errorResponse)
+            }
+
+            is ActionResult.Success -> BaseResponseBody.from<List<Account>, List<AccountDTO>>(actionResult)
+            { accounts -> accounts?.map { it.toDTO() } }.asEntity(successHttpStatus = HttpStatus.OK)
+        }
+    }
+
     @Operation(summary = "accounts section")
     @GetMapping("/member/{memberId}")
     fun accounts(@PathVariable(required = true) memberId: UUID) : ResponseEntity<*> {

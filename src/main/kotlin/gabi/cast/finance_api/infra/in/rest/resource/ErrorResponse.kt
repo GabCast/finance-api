@@ -23,6 +23,7 @@ sealed class ErrorResponse(
                 ErrorResult.NotFound -> NotFoundError
                 ErrorResult.MemberNotFound -> MemberNotFoundError
                 ErrorResult.AccountsNotFound -> AccountsNotFoundError
+                ErrorResult.AccountNotFound -> AccountNotFoundError
                 ErrorResult.ActivitiesForMemberNotFound -> ActivityNotFoundForMemberError
                 ErrorResult.ActivitiesForAccountNotFound -> ActivityNotFoundForAccountError
                 ErrorResult.CommentsForActivityNotFound -> CommentNotFoundForActivityError
@@ -60,6 +61,13 @@ sealed class ErrorResponse(
         errorCode = "ACCOUNTS NOT FOUND",
         title = "No accounts found for this member.",
         message = "No accounts found for this member."
+    )
+
+    data object AccountNotFoundError : ErrorResponse(
+        HttpStatus.NOT_FOUND,
+        errorCode = "ACCOUNT NOT FOUND",
+        title = "No account found for this id.",
+        message = "No account found for this id."
     )
 
     data object ActivityNotFoundForAccountError : ErrorResponse(
