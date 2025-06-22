@@ -28,4 +28,6 @@ data class Comment(
     val activity: Activity,
 
     val createdAt: Timestamp = Timestamp(System.currentTimeMillis()),
+
+    val updatedAt: Timestamp? = null,
 )

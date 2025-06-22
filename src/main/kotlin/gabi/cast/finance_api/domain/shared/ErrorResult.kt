@@ -8,4 +8,6 @@ sealed class ErrorResult {
     data object NotFound : ErrorResult()
     data object ActivitiesForMemberNotFound : ErrorResult()
     data object ActivitiesForAccountNotFound : ErrorResult()
+    data object CommentsForActivityNotFound : ErrorResult()
+    data object ActivityNotFound : ErrorResult()
 }

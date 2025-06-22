@@ -25,6 +25,8 @@ sealed class ErrorResponse(
                 ErrorResult.AccountsNotFound -> AccountsNotFoundError
                 ErrorResult.ActivitiesForMemberNotFound -> ActivityNotFoundForMemberError
                 ErrorResult.ActivitiesForAccountNotFound -> ActivityNotFoundForAccountError
+                ErrorResult.CommentsForActivityNotFound -> CommentNotFoundForActivityError
+                ErrorResult.ActivityNotFound -> ActivityNotFoundError
             }
             errorResponse.traceId = UUID.randomUUID().toString()
             return errorResponse
@@ -72,6 +74,20 @@ sealed class ErrorResponse(
         errorCode = "ACTIVITY NOT FOUND",
         title = "No activity found for this member.",
         message = "No activity found for this member."
+    )
+
+    data object CommentNotFoundForActivityError : ErrorResponse(
+        HttpStatus.NOT_FOUND,
+        errorCode = "COMMENT NOT FOUND",
+        title = "No comment found for this activity.",
+        message = "No comment found for this activity."
+    )
+
+    data object ActivityNotFoundError : ErrorResponse(
+        HttpStatus.NOT_FOUND,
+        errorCode = "ACTIVITY NOT FOUND",
+        title = "No activity found for this id.",
+        message = "No activity found for this id."
     )
 
     data class BadRequestError(
