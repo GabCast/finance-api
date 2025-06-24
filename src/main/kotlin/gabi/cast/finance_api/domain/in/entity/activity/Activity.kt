@@ -1,5 +1,7 @@
 package gabi.cast.finance_api.domain.`in`.entity.activity
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonManagedReference
 import gabi.cast.finance_api.domain.`in`.entity.Comment
 import gabi.cast.finance_api.domain.`in`.entity.account.Account
 import gabi.cast.finance_api.domain.shared.ActivityType
@@ -27,6 +29,7 @@ data class Activity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)
+    @JsonIgnore
     val account: Account,
 
     val amount: Double,
@@ -39,5 +42,6 @@ data class Activity(
     val paid: Boolean = false,
 
     @OneToMany(mappedBy = "activity", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    @JsonManagedReference("activity-comments") // padre
     val comments: List<Comment>? = null,
 )

@@ -4,6 +4,7 @@ import gabi.cast.finance_api.domain.`in`.CommentService
 import gabi.cast.finance_api.domain.`in`.entity.Comment
 import gabi.cast.finance_api.domain.shared.ActionResult
 import gabi.cast.finance_api.domain.shared.ErrorResult
+import gabi.cast.finance_api.domain.shared.toActionResultIfNotEmpty
 import gabi.cast.finance_api.infra.`in`.rest.model.CommentDomain
 import gabi.cast.finance_api.infra.out.repository.ActivityAdapter
 import gabi.cast.finance_api.infra.out.repository.CommentAdapter
@@ -18,26 +19,34 @@ class CommentServiceImpl(
     private val activitiesAdapter: ActivityAdapter,
 ) : CommentService {
 
-    override fun findByActivityId(id: UUID): ActionResult {
-       val result = commentAdapter.findByActivityId(id)
-        return when {
-           result.isEmpty() -> ActionResult.Error(ErrorResult.CommentsForActivityNotFound)
-           else -> ActionResult.Success(result)
-        }
+    override fun findByActivityId(id: UUID): ActionResult<List<Comment?>> = runCatching {
+        commentAdapter.findByActivityId(id)
+    }.fold(
+        onSuccess = { optional ->
+            optional.toActionResultIfNotEmpty(ErrorResult.CommentsForActivityNotFound)
+        },
+        onFailure = { ActionResult.Error(ErrorResult.InternalServerError) }
+    ).also {
+        println("Found comments for activity id: $id")
+        println("Result: $it")
     }
 
-    override fun save(commentDomain: CommentDomain): ActionResult {
+    override fun save(commentDomain: CommentDomain): ActionResult<Comment> = runCatching {
         // get activity
         val activitySaved = activitiesAdapter.findById(commentDomain.activityId).orElse(null)
             ?: return ActionResult.Error(ErrorResult.ActivityNotFound)
 
         //save comment
         val comment = Comment(text = commentDomain.text, activity = activitySaved)
-
-        return ActionResult.Success(commentAdapter.save(comment))
+        commentAdapter.save(comment)
+    }.fold(
+        onSuccess = { ActionResult.Success(it) },
+        onFailure = { ActionResult.Error(ErrorResult.InternalServerError) }
+    ).also {
+        println("Saved comment: $it")
     }
 
-    override fun update(id: UUID, text: String): ActionResult {
+    override fun update(id: UUID, text: String): ActionResult<Comment> = runCatching {
         // get comment
         val comment = commentAdapter.findById(id).orElse(null)
             ?: return ActionResult.Error(ErrorResult.CommentsForActivityNotFound)
@@ -46,19 +55,24 @@ class CommentServiceImpl(
         val commentUpdated = comment.copy(text = text, updatedAt = Timestamp.from(Instant.now()))
 
         // updated
-        return ActionResult.Success(commentAdapter.save(commentUpdated))
+        commentAdapter.save(commentUpdated)
+    }.fold(
+        onSuccess = { ActionResult.Success(it) },
+        onFailure = { ActionResult.Error(ErrorResult.InternalServerError) }
+    ).also {
+        println("Saved comment: $it")
     }
 
-    override fun delete(id: UUID): ActionResult {
-        return try {
-            if (!commentAdapter.existsById(id)) {
-                return ActionResult.Error(ErrorResult.CommentsForActivityNotFound)
-            }
-            commentAdapter.deleteById(id)
-            ActionResult.Success(Unit)
-        } catch (ex: Exception) {
-            println("Error deleting comment: ${ex.message}")
-            ActionResult.Error(ErrorResult.InternalServerError)
+
+    override fun delete(id: UUID): ActionResult<Unit> = runCatching {
+        if (!commentAdapter.existsById(id)) {
+            return ActionResult.Error(ErrorResult.CommentsForActivityNotFound)
         }
+        commentAdapter.deleteById(id)
+    }.fold(
+        onSuccess = { ActionResult.Success(Unit) },
+        onFailure = { ActionResult.Error(ErrorResult.InternalServerError) }
+    ).also {
+        println("Deleted comment: $id")
     }
 }

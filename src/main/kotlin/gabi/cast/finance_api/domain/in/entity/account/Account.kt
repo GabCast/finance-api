@@ -1,5 +1,6 @@
 package gabi.cast.finance_api.domain.`in`.entity.account
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import gabi.cast.finance_api.domain.`in`.entity.Member
 import gabi.cast.finance_api.domain.shared.Currency
 import jakarta.persistence.Column
@@ -26,6 +27,7 @@ data class Account(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false) // nombre de la columna FK en la tabla
+    @JsonIgnore
     val member: Member,
 
     @Column(unique = true)

@@ -15,7 +15,7 @@ sealed class BaseResponseBody<out T> : Serializable {
 
     companion object {
 
-        fun <T> from(actionResult: ActionResult): BaseResponseBody<T> =
+        fun <T> from(actionResult: ActionResult<T>): BaseResponseBody<T> =
             when (actionResult) {
                 is ActionResult.Error -> {
                     val errorResponse = ErrorResponse.Companion.from(actionResult.error)
@@ -27,7 +27,7 @@ sealed class BaseResponseBody<out T> : Serializable {
             }
 
         fun <D, T> from(
-            actionResult: ActionResult,
+            actionResult: ActionResult<D>,
             transform: (D?) -> T?
         ): BaseResponseBody<T> =
             when (actionResult) {

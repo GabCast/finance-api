@@ -1,13 +1,10 @@
 package gabi.cast.finance_api.infra.`in`.rest.controller
 
-import gabi.cast.finance_api.infra.out.rest.AccountDTO
 import gabi.cast.finance_api.infra.out.rest.toDTO
 import gabi.cast.finance_api.domain.`in`.AccountService
-import gabi.cast.finance_api.domain.`in`.entity.account.Account
-import gabi.cast.finance_api.domain.shared.ActionResult
+import gabi.cast.finance_api.domain.shared.map
+import gabi.cast.finance_api.domain.shared.mapList
 import gabi.cast.finance_api.infra.`in`.rest.model.AccountDomain
-import gabi.cast.finance_api.infra.`in`.rest.resource.BaseResponseBody
-import gabi.cast.finance_api.infra.`in`.rest.resource.ErrorResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -24,43 +21,18 @@ import java.util.UUID
 
 @RestController
 @RequestMapping("/account")
-class AccountController (private val accountsService: AccountService) {
+class AccountController(private val accountsService: AccountService) {
 
     @Operation(summary = "account by Id")
     @GetMapping("/{accountId}")
-    fun account(@PathVariable(required = true) accountId: UUID) : ResponseEntity<*> {
-        return when (val actionResult =
-            accountsService.findById(accountId)) {
-            is ActionResult.Error -> {
-                val errorResponse =
-                    ErrorResponse.from(
-                        actionResult.error
-                    )
-                ResponseEntity.status(errorResponse.httpStatusCode).body(errorResponse)
-            }
-
-            is ActionResult.Success -> BaseResponseBody.from<List<Account>, List<AccountDTO>>(actionResult)
-            { accounts -> accounts?.map { it.toDTO() } }.asEntity(successHttpStatus = HttpStatus.OK)
-        }
-    }
+    fun account(@PathVariable(required = true) accountId: UUID): ResponseEntity<*> =
+        accountsService.findById(accountId).map(transform = { it.toDTO() }, successStatus = HttpStatus.OK)
 
     @Operation(summary = "accounts section")
     @GetMapping("/member/{memberId}")
-    fun accounts(@PathVariable(required = true) memberId: UUID) : ResponseEntity<*> {
-        return when (val actionResult =
-            accountsService.findByMemberId(memberId)) {
-            is ActionResult.Error -> {
-                val errorResponse =
-                    ErrorResponse.from(
-                        actionResult.error
-                    )
-                ResponseEntity.status(errorResponse.httpStatusCode).body(errorResponse)
-            }
-
-            is ActionResult.Success -> BaseResponseBody.from<List<Account>, List<AccountDTO>>(actionResult)
-            { accounts -> accounts?.map { it.toDTO() } }.asEntity(successHttpStatus = HttpStatus.OK)
-        }
-    }
+    fun accounts(@PathVariable(required = true) memberId: UUID): ResponseEntity<*> =
+        accountsService.findByMemberId(memberId)
+            .mapList(transform = { it?.toDTO() }, successStatus = HttpStatus.OK)
 
     @Operation(
         summary = "Create a new account",
@@ -72,20 +44,6 @@ class AccountController (private val accountsService: AccountService) {
         )
     )
     @PostMapping()
-    fun createAccount(@RequestBody(required = true) account: AccountDomain) : ResponseEntity<*> {
-
-        return when (val actionResult =
-            accountsService.save(account)) {
-            is ActionResult.Error -> {
-                val errorResponse =
-                    ErrorResponse.from(
-                        actionResult.error
-                    )
-                ResponseEntity.status(errorResponse.httpStatusCode).body(errorResponse)
-            }
-
-            is ActionResult.Success -> BaseResponseBody.from<Account, AccountDTO>(actionResult)
-            { it?.toDTO() }.asEntity(successHttpStatus = HttpStatus.CREATED)
-        }
-    }
+    fun createAccount(@RequestBody(required = true) account: AccountDomain): ResponseEntity<*> =
+        accountsService.save(account).map(transform = { it.toDTO() }, successStatus = HttpStatus.OK)
 }

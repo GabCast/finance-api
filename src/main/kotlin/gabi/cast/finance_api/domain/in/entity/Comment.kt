@@ -22,7 +22,7 @@ data class Comment(
 
     val text: String,
 
-    @JsonBackReference
+    @JsonBackReference("activity-comments") // hijo
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "activity_id", nullable = false)
     val activity: Activity,
@@ -30,4 +30,17 @@ data class Comment(
     val createdAt: Timestamp = Timestamp(System.currentTimeMillis()),
 
     val updatedAt: Timestamp? = null,
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+        other as Comment
+        return id == other.id
+    }
+
+    override fun hashCode(): Int = id?.hashCode() ?: 0
+
+    override fun toString(): String {
+        return "Comment(id=$id, text=$text, createdAt=$createdAt, updatedAt=$updatedAt)"
+    }
+}
