@@ -44,4 +44,6 @@ data class Activity(
     @OneToMany(mappedBy = "activity", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonManagedReference("activity-comments") // padre
     val comments: List<Comment>? = null,
+
+    val updatedAt: Timestamp? = null,
 )

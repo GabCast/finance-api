@@ -46,6 +46,10 @@ class CommentController(private val commentService: CommentService) {
 
 
     @PutMapping("/{commentId}")
+    @Operation(
+        summary = "Update a comment",
+        description = "Update a comment with the specified data.",
+    )
     fun update(
         @PathVariable(required = true) commentId: UUID,
         @RequestBody(required = true) comment: String
@@ -53,6 +57,10 @@ class CommentController(private val commentService: CommentService) {
         commentService.update(commentId, comment).map(transform = { it.toDTO() }, successStatus = HttpStatus.OK)
 
     @DeleteMapping("/{commentId}")
+    @Operation(
+        summary = "Delete a comment",
+        description = "Delete a comment with the specified data.",
+    )
     suspend fun delete(@PathVariable(required = true) commentId: UUID): ResponseEntity<*> =
         commentService.delete(commentId).mapUnit(successStatus = HttpStatus.NO_CONTENT)
 }
