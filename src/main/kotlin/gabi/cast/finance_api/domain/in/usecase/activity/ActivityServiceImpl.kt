@@ -45,7 +45,7 @@ class ActivityServiceImpl(
             ?: return ActionResult.Error(ErrorResult.AccountsNotFound)
 
         // save activity
-        val activity = Activity(account = account, amount = activity.amount, type = activity.type)
+        val activity = Activity(account = account, amount = activity.amount, type = activity.type, paid = activity.paid)
         activityAdapter.save(activity)
     }.fold(
         onSuccess = { ActionResult.Success(it) },

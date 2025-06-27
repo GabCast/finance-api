@@ -1,7 +1,9 @@
 package gabi.cast.finance_api.domain.`in`.entity.account
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonManagedReference
 import gabi.cast.finance_api.domain.`in`.entity.Member
+import gabi.cast.finance_api.domain.`in`.entity.activity.Activity
 import gabi.cast.finance_api.domain.shared.Currency
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -14,6 +16,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.Index
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
+import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import java.sql.Timestamp
 import java.util.UUID
@@ -36,7 +39,15 @@ data class Account(
     @Enumerated(EnumType.STRING)
     val currency: Currency,
 
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
+    @JsonManagedReference("account-activities") // padre
+    val activities: List<Activity?> = listOf(),
+
     val createdAt: Timestamp = Timestamp(System.currentTimeMillis()),
 
     val updatedAt: Timestamp? = null,
-)
+) {
+    override fun toString(): String {
+        return "Account(id=$id, name=$name, currency=$currency)"
+    }
+}

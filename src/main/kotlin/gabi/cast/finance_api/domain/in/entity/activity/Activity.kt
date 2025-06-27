@@ -1,6 +1,6 @@
 package gabi.cast.finance_api.domain.`in`.entity.activity
 
-import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonBackReference
 import com.fasterxml.jackson.annotation.JsonManagedReference
 import gabi.cast.finance_api.domain.`in`.entity.Comment
 import gabi.cast.finance_api.domain.`in`.entity.account.Account
@@ -29,7 +29,7 @@ data class Activity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)
-    @JsonIgnore
+    @JsonBackReference("account-activities") // hijo
     val account: Account,
 
     val amount: Double,
@@ -46,4 +46,8 @@ data class Activity(
     val comments: List<Comment>? = null,
 
     val updatedAt: Timestamp? = null,
-)
+) {
+    override fun toString(): String {
+        return "Activity(id=$id, amount=$amount, type=$type, paid=$paid)"
+    }
+}

@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.parameters.RequestBody as SwaggerRequestBody
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -70,7 +71,7 @@ class ActivityController(private val activityService: ActivityService) {
         summary = "Delete an activity",
         description = "Delete an activity with the specified data.",
     )
-    @PutMapping("/{activityId}")
+    @DeleteMapping("/{activityId}")
     fun delete(
         @PathVariable activityId: UUID
     ): ResponseEntity<*> =

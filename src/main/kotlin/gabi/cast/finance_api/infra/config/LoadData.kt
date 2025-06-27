@@ -54,10 +54,17 @@ class LoadData(
                 Activity(
                     account = accountAdapter.findByName("Wise")!!,
                     amount = 40000.0,
-                    type = ActivityType.CREDIT
+                    type = ActivityType.CREDIT,
+                    paid = true
                 ),
-                Activity(account = accountAdapter.findByName("Cash")!!, amount = 5000.0, type = ActivityType.CREDIT),
-                Activity(account = accountAdapter.findByName("N26")!!, amount = 18.67, type = ActivityType.CREDIT),
+                Activity(
+                    account = accountAdapter.findByName("Wise")!!,
+                    amount = 100.0,
+                    type = ActivityType.DEBIT,
+                    paid = true
+                ),
+                Activity(account = accountAdapter.findByName("Cash")!!, amount = 5000.0, type = ActivityType.CREDIT, paid = true),
+                Activity(account = accountAdapter.findByName("N26")!!, amount = 18.67, type = ActivityType.CREDIT, paid = true),
             )
             activityAdapter.saveAll(activities)
             val activitySaved = activityAdapter.save(
